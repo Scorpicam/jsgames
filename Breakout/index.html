@@ -75,7 +75,11 @@
 							b.status = 0;
 							score++;
 							if (score == brickRowCount*brickColumnCount) {
+								ctx.clearRect(0, 0, canvas.width, canvas.height);
 								drawScore();
+								drawLives();
+								drawBall();
+								drawPaddle();
 								drawBricks();
 								alert("YOU WIN");
 								document.location.reload();
@@ -108,7 +112,12 @@
 				} else {
 					lives--;
 					if (!lives) {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						drawScore();
 						drawLives();
+						drawBall();
+						drawPaddle();
+						drawBricks();
 						alert("GAME OVER");
 						document.location.reload();
 					} else {
