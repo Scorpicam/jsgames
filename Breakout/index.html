@@ -75,6 +75,8 @@
 							b.status = 0;
 							score++;
 							if (score == brickRowCount*brickColumnCount) {
+								drawScore();
+								drawBricks();
 								alert("YOU WIN");
 								document.location.reload();
 							}
@@ -106,6 +108,7 @@
 				} else {
 					lives--;
 					if (!lives) {
+						drawLives();
 						alert("GAME OVER");
 						document.location.reload();
 					} else {
