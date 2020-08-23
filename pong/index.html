@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Pong</title>
+	<style>
+		* {
+			background: #CCCCCC;
+			margin: 0;
+			padding: 0;
+		}
+		canvas {
+			background: #E0E0E0;
+			margin: 0 auto;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="board" width="480" height="320">
+		HTML5 canvas tag not supported
+	</canvas>
+	<script>
+		var canvas = document.getElementById("board");
+		var ctx = canvas.getContext("2d");
+
+		var x, y;
+		var dx = 2;
+		var dy = -2;
+		var bRad = 10;
+
+		var pHeight = 75;
+		var pWidth = 20;
+
+		var p1X, p1Y;
+		var p2X, p2Y;
+
+		var p1Score = 0;
+		var p2Score = 0;
+
+		var p1MoveUp, p1MoveDown;
+		var p2MoveUp, p2MoveDown;
+
+		var moveLim = 7;
+
+		reset();
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key == "Up" || e.key == "ArrowUp") {
+				p2MoveUp = true;
+			} else if (e.key == "Down" || e.key == "ArrowDown") {
+				p2MoveDown = true;
+			}
+
+			if (e.keyCode == 87) { // W
+				p1MoveUp = true;
+			} else if (e.keyCode == 83) { // S
+				p1MoveDown = true;
+			}
+		});
+		document.addEventListener('keyup', function(e) {
+			if (e.key == "Up" || e.key == "ArrowUp") {
+				p2MoveUp = false;
+			} else if (e.key == "Down" || e.key == "ArrowDown") {
+				p2MoveDown = false;
+			}
+
+			if (e.key == "w") {
+				p1MoveUp = false;
+			} else if (e.key == "s") {
+				p1MoveDown = false;
+			}
+		});
+
+		game();
+
+		function game() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			drawPaddle(p1X, p1Y);
+			drawPaddle(p2X, p2Y);
+			drawBall();
+			drawScore();
+
+			move();
+			collision();
+
+			x+=dx;
+			y+=dy;
+
+			requestAnimationFrame(game);
+		}
+
+		function collision() {
+			if (x+dx > canvas.width-bRad) {
+				p1Score++;
+				reset();
+			}
+			if (x+dx < bRad) {
+				p2Score++;
+				reset();
+			}
+
+			if (y+dy > canvas.height-bRad || y+dy < bRad) {
+				dy = -dy;
+			}
+
+			if (x+dx+bRad > p1X && x+dx < p1X+pWidth+bRad
+				&& y+dy+bRad > p1Y && y+dy < p1Y+pHeight+bRad) {
+				dx = -dx;
+			}
+			if (x+dx+bRad > p2X && x+dx < p2X+pWidth-bRad
+				&& y+dy+bRad > p2Y && y+dy < p2Y+pHeight-bRad) {
+				dx = -dx;
+			}
+		}
+
+		function move() {
+			if (p1MoveUp && p1Y-moveLim >= 0) {
+				p1Y-=moveLim;
+			}
+			if (p1MoveDown && p1Y+pHeight+moveLim <= canvas.height) {
+				p1Y+=moveLim;
+			}
+			if (p2MoveUp && p2Y-moveLim >= 0) {
+				p2Y-=moveLim;
+			}
+			if (p2MoveDown && p2Y+pHeight+moveLim <= canvas.height) {
+				p2Y+=moveLim;
+			}
+		}
+
+		function reset() {
+			p1X = 30;
+			p1Y = (canvas.height/2)-(pHeight/2);
+			p1MoveUp = false;
+			p1MoveDown = false;
+
+			p2X = (canvas.width-30)-pWidth;
+			p2Y = (canvas.height/2)-(pHeight/2);
+			p2MoveUp = false;
+			p2MoveDown = false;
+
+			x = canvas.width/2;
+			y = canvas.height/2;
+		}
+
+		function drawPaddle(x, y) {
+			ctx.beginPath();
+			ctx.rect(x, y, pWidth, pHeight);
+			ctx.fillStyle = "#0095DD";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawBall() {
+			ctx.beginPath();
+			ctx.arc(x, y, bRad, 0, Math.PI*2);
+			ctx.fillStyle = "#0095DD";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawScore() {
+			ctx.beginPath();
+			ctx.font = "16px Arial";
+			ctx.fillStyle = "#0095DD";
+			ctx.fillText(p1Score, 8, 20);
+			var distance = (Math.sign(p2Score-10) != -1) ? 24 : 16;
+			ctx.fillText(p2Score, canvas.width-distance, 20);
+			ctx.closePath();
+
+			if (p1Score == 10) {
+				alert("Player 1 Wins!");
+				document.location.reload();
+			} else if (p2Score == 10) {
+				alert("Player 2 Wins!");
+				document.location.reload();
+			}
+		}
+	</script>
+</body>
+
+</html>
