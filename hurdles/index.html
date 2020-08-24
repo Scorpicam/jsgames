@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Hurdles</title>
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+			background: #CCCCCC;
+		}
+		canvas {
+			margin: 0 auto;
+			background: #E0E0E0;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="board" width="480" height="320">
+		HTML5 canvas tag not supported
+	</canvas>
+	<script>
+		var canvas = document.getElementById("board");
+		var ctx = canvas.getContext("2d");
+
+		var floorHeight = 10;
+
+		var height = 48;
+		var width = 20;
+		var offset = 32;
+
+		var floor = canvas.height-floorHeight;
+		var proFloor = floor-height;
+		var y = proFloor;
+
+		var gravity = 1;
+		var jump = false;
+		var force = 0;
+		var jumpForce = 16;
+
+		var obsGap = 10;
+		var obsCount = 3;
+		var obstacle = {
+			x: canvas.width, 
+			width: 20,
+			height: 20,
+			speed: 1,
+			draw: function() {
+				ctx.beginPath();
+				ctx.rect(this.x, floor-this.height, this.width, this.height);
+				ctx.fillStyle = "#0095DD";
+				ctx.fill();
+				ctx.closePath();
+			},
+			move: function() {
+				this.x -= this.speed;
+			},
+			collision: function() {
+				if (y+height >= floor-this.height && offset+width >= this.x) {
+					if (!(offset+width > this.x+this.width)) {
+						alert ("YOU LOSE");
+						document.location.reload();
+					}
+				}
+			}
+		};
+		var obs = [];
+		for (var o = 0; o < obsCount; o++) {
+			obs[o] = obstacle;
+			obs[o].x = canvas.width+(obsGap*o);
+		}
+
+		var score = 0;
+
+		document.addEventListener('keydown', function(e) {
+			if (e.keyCode == 87 || e.key == "ArrowUp") {
+				jump = true;
+			}
+			if (e.key == "Up" || e.keyCode == 32) {
+				jump = true;
+			}
+		});
+		document.addEventListener('keyup', function(e) {
+			if (e.keyCode == 87 || e.key == "ArrowUp") {
+				jump = false;
+			}
+			if (e.key == "Up" || e.keyCode == 32) {
+				jump = false;
+			}
+		});
+		document.addEventListener('touchstart', function(e) {
+			jump = true;
+		});
+		document.addEventListener('touchend', function(e) {
+			jump = false;
+		});
+
+		game();
+
+		function game() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			drawFloor();
+			drawPro();
+			drawScore();
+			drawObs();
+
+			leap();
+
+			requestAnimationFrame(game);
+		}
+
+		function leap() {
+			if (jump && y == proFloor) {
+				force = jumpForce;
+			}
+			if (y-force >= proFloor) {
+				y = proFloor;
+				force = 0;
+			}
+			y -= force;
+			force -= gravity;
+		}
+
+		function drawFloor() {
+			ctx.beginPath();
+			ctx.rect(0, canvas.height-floorHeight, canvas.width, floorHeight);
+			ctx.fillStyle = "#0095DD";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawPro() {
+			ctx.beginPath();
+			ctx.rect(offset, y, width, height);
+			ctx.fillStyle = "#0095DD";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawScore() {
+			ctx.beginPath();
+			ctx.font = "16px Arial";
+			ctx.fillStyle = "0095DD";
+			ctx.fillText(score, 8, 20);
+			ctx.beginPath();
+		}
+		function drawObs() {
+			for (var o = 0; o < obsCount; o++) {
+				obs[o].draw();
+				obs[o].collision();
+				obs[o].move();
+				if (obs[o].x <= 0-obs[o].width) {
+					obs[o].x = canvas.width;
+					score++;
+					if (score%10 == 0) {
+						obs[o].speed++;
+					}
+				}
+			}
+		}
+	</script>
+</body>
+
+</html>
