@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8"/>
+	<title>Ghost</title>
+	<style>
+		* {
+			background: #0f0f0f;
+			margin: 0;
+			padding: 0;
+		}
+		canvas {
+			background: #333333;
+			margin: 0 auto;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="board" width="480" height="320">
+		HTML5 canvas tag not supported
+	</canvas>
+	<script>
+		var canvas = document.getElementById("board");
+		var ctx = canvas.getContext("2d");
+
+		var ghost = {
+			x: canvas.width / 2,
+			y: canvas.height / 2,
+			dx: -2,
+			dy: 2,
+			h: 51,
+			w: 41,
+			image: new Image(),
+			src: "src/ghost.png",
+			draw: function() {
+				this.image.src = this.src;
+				ctx.beginPath();
+				ctx.drawImage(this.image, this.x, this.y);
+				ctx.closePath();
+			},
+			collision: function() {
+				if (this.x+this.w >= canvas.width ||
+					this.x+this.dx <= 0) {
+					this.dx = -this.dx;
+				}
+				if (this.y+this.h >= canvas.height ||
+					this.y+this.dy <= 0) {
+					this.dy = -this.dy;
+				}
+			},
+			move: function() {
+				this.x += this.dx;
+				this.y += this.dy;
+			}
+		};
+
+		anim();
+
+		function anim() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ghost.draw();
+			ghost.collision();
+			ghost.move();
+			requestAnimationFrame(anim);
+		}
+	</script>
+</body>
+
+</html>
